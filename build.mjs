@@ -1,14 +1,12 @@
 // copied from beef for now
 
-import { readFile, writeFile, readdir } from "fs/promises";
+import { readFile, writeFile, readdir, access } from "fs/promises";
 import { createHash } from "crypto";
 import { rollup } from "rollup";
 import esbuildPlugin from "rollup-plugin-esbuild";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import * as esbuild from "esbuild";
-
-import { readFile, writeFile, readdir, access } from "fs/promises";
 
 const entries = await readdir("./", { withFileTypes: true });
 for (const entry of entries) {
