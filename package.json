@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "node build.mjs"
+    "build": "bun run build.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
@@ -10,5 +10,9 @@
     "rollup": "^3.9.1",
     "rollup-plugin-esbuild": "^5.0.0",
     "vendetta-types": "^2.4.20"
-  }
+  },
+  "dependencies": {
+    "raindevtools": "^1.0.3"
+  },
+  "workspaces": ["plugins/*"]
 }
