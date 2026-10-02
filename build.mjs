@@ -8,15 +8,13 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import * as esbuild from "esbuild";
 
-for (let plug of await readdir("./plugins")) {
-  const manifest = JSON.parse(
-    await readFile(`./plugins/${plug}/manifest.json`),
-  );
+for (let plug of await readdir("./")) {
+  const manifest = JSON.parse(await readFile(`./${plug}/manifest.json`));
   const outPath = `./dist/${plug}/index.js`;
 
   try {
     const bundle = await rollup({
-      input: `./plugins/${plug}/${manifest.main}`,
+      input: `./${plug}/${manifest.main}`,
       onwarn: () => {},
       plugins: [
         nodeResolve(),
