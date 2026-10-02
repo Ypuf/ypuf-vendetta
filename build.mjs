@@ -80,6 +80,11 @@ for (const entry of entries) {
       if (e.code !== "ENOENT") throw e;
     }
 
+    for (const file of await readdir(`./${plug}`)) {
+      if (/\.(png|jpe?g|gif|webp|svg)$/i.test(file))
+        await copyFile(`./${plug}/${file}`, `./dist/${plug}/${file}`);
+    }
+
     console.log(`Successfully built ${manifest.name}!`);
   } catch (e) {
     console.error("Failed to build plugin...", e);

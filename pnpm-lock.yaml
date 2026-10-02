@@ -27,12 +27,6 @@ importers:
         specifier: ^2.4.20
         version: 2.4.21(react-native@0.87.1(@babel/core@7.29.7(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
 
-  plugins/realmoji:
-    dependencies:
-      vendetta-extras:
-        specifier: ^1.0.3
-        version: 1.0.3
-
 packages:
 
   '@babel/code-frame@7.29.7':
@@ -1143,9 +1137,6 @@ packages:
   utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
-
-  vendetta-extras@1.0.3:
-    resolution: {integrity: sha512-3PSNahx9Mm7lsElruCX2oebmcDb5XI6a4G8G6aqbw+UYHj3bRuxwiyv9RNqXhHi4mQTARRuDIwucBZSf1/BxDg==}
 
   vendetta-types@2.4.21:
     resolution: {integrity: sha512-L2HwBkF4DCF0Kiov8Ld75Zwl5UBy75ZC8ZPpXtpQgvuHsYbhHAtrhWrpzAf76VGV9k5J1nC5JcxUZQ+f7NjRGw==}
@@ -2378,8 +2369,6 @@ snapshots:
       picocolors: 1.1.1
 
   utils-merge@1.0.1: {}
-
-  vendetta-extras@1.0.3: {}
 
   vendetta-types@2.4.21(react-native@0.87.1(@babel/core@7.29.7(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react@19.3.0):
     dependencies:
