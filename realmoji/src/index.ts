@@ -6,6 +6,11 @@ const patches = [];
 const { getCustomEmojiById } = findByStoreName("EmojiStore");
 const RowManager = findByName("RowManager");
 const emojiRegex = /https:\/\/cdn.discordapp.com\/emojis\/(\d+)\.(\w+)/;
+const emojiToken =
+  /\[[^\]\n]*\]\(https:\/\/cdn\.discordapp\.com\/emojis\/\d+\.\w+[^)\s]*\)|https:\/\/cdn\.discordapp\.com\/emojis\/\d+\.\w+\S*/;
+const emojiLine = new RegExp(
+  `^(?:${emojiToken.source})(?:[ \\t]+(?:${emojiToken.source}))*$`,
+);
 
 patches.push(
   before("generate", RowManager.prototype, ([data]) => {
@@ -13,17 +18,26 @@ patches.push(
 
     let content = data.message.content as string;
     if (!content?.length) return;
-    const matchIndex = content.match(emojiRegex)?.index;
+    const matchIndex = content.match(emojiToken)?.index;
     if (matchIndex === undefined) return;
-    const emojis = content.slice(matchIndex).trim().split("\n");
-    if (!emojis.every((s) => s.match(emojiRegex))) return;
+    const lines = content
+      .slice(matchIndex)
+      .trim()
+      .split("\n")
+      .map((l) => l.trim());
+    if (!lines.every((l) => emojiLine.test(l))) return;
     content = content.slice(0, matchIndex);
 
-    while (content.indexOf("  ") !== -1)
-      content = content.replace("  ", ` ${emojis.shift()} `);
+    if (lines.some((l) => /\s/.test(l))) {
+      content = (content + lines.join("\n")).trim();
+    } else {
+      const emojis = lines;
+      while (content.indexOf("  ") !== -1)
+        content = content.replace("  ", ` ${emojis.shift()} `);
 
-    content = content.trim();
-    if (emojis.length) content += ` ${emojis.join(" ")}`;
+      content = content.trim();
+      if (emojis.length) content += ` ${emojis.join(" ")}`;
+    }
 
     const embeds = data.message.embeds as Embed[];
     for (let i = 0; i < embeds.length; i++) {
@@ -46,7 +60,7 @@ patches.push(
     const jumbo = content.every(
       (c) =>
         (c.type === "link" && c.target.match(emojiRegex)) ||
-        (c.type === "text" && c.content === " "),
+        (c.type === "text" && /^\s+$/.test(c.content)),
     );
 
     for (let i = 0; i < content.length; i++) {

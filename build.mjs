@@ -1,6 +1,6 @@
 // copied from beef for now
 
-import { readFile, writeFile, readdir, access } from "fs/promises";
+import { readFile, writeFile, readdir, access, copyFile } from "fs/promises";
 import { createHash } from "crypto";
 import { rollup } from "rollup";
 import esbuildPlugin from "rollup-plugin-esbuild";
@@ -73,6 +73,12 @@ for (const entry of entries) {
     manifest.hash = createHash("sha256").update(toHash).digest("hex");
     manifest.main = "index.js";
     await writeFile(`./dist/${plug}/manifest.json`, JSON.stringify(manifest));
+
+    try {
+      await copyFile(`./${plug}/index.html`, `./dist/${plug}/index.html`);
+    } catch (e) {
+      if (e.code !== "ENOENT") throw e;
+    }
 
     console.log(`Successfully built ${manifest.name}!`);
   } catch (e) {
