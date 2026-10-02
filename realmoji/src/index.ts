@@ -64,13 +64,13 @@ patches.push(
 
       const animated = match[2] === "gif" || params?.get("animated") === "true";
       const name =
-        getCustomEmojiById(id)?.name ?? params?.get("name") ?? "realmoji";
+        getCustomEmojiById(id)?.name ?? params?.get("name") ?? ":realmoji:";
       const base = `https://cdn.discordapp.com/emojis/${id}`;
 
       content[i] = {
         type: "customEmoji",
         id,
-        alt: `:${name}:`,
+        alt: `${name}`,
         src: `${base}.${animated ? "gif" : "webp"}?size=128`,
         frozenSrc: `${base}.webp?size=128`,
         jumboable: jumbo ? true : undefined,
