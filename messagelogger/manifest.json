@@ -1,0 +1,14 @@
+{
+  "name": "Messagelogger",
+  "description": "Better Messagelogger",
+  "authors": [
+    {
+      "name": "ypuf",
+      "id": "183033251206660097"
+    }
+  ],
+  "main": "src/index.ts",
+  "vendetta": {
+    "icon": "ic_emoji_24px"
+  }
+}
