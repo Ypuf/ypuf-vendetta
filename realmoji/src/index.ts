@@ -7,67 +7,76 @@ const { getCustomEmojiById } = findByStoreName("EmojiStore");
 const RowManager = findByName("RowManager");
 const emojiRegex = /https:\/\/cdn.discordapp.com\/emojis\/(\d+)\.(\w+)/;
 
-patches.push(before("generate", RowManager.prototype, ([data]) => {
-  if (data.rowType !== 1) return;
+patches.push(
+  before("generate", RowManager.prototype, ([data]) => {
+    if (data.rowType !== 1) return;
 
-  let content = data.message.content as string;
-  if (!content?.length) return;
-  const matchIndex = content.match(emojiRegex)?.index;
-  if (matchIndex === undefined) return;
-  const emojis = content.slice(matchIndex).trim().split("\n");
-  if (!emojis.every((s) => s.match(emojiRegex))) return;
-  content = content.slice(0, matchIndex);
+    let content = data.message.content as string;
+    if (!content?.length) return;
+    const matchIndex = content.match(emojiRegex)?.index;
+    if (matchIndex === undefined) return;
+    const emojis = content.slice(matchIndex).trim().split("\n");
+    if (!emojis.every((s) => s.match(emojiRegex))) return;
+    content = content.slice(0, matchIndex);
 
-  while (content.indexOf("  ") !== -1)
-    content = content.replace("  ", ` ${emojis.shift()} `);
+    while (content.indexOf("  ") !== -1)
+      content = content.replace("  ", ` ${emojis.shift()} `);
 
-  content = content.trim();
-  if (emojis.length) content += ` ${emojis.join(" ")}`;
+    content = content.trim();
+    if (emojis.length) content += ` ${emojis.join(" ")}`;
 
-  const embeds = data.message.embeds as Embed[];
-  for (let i = 0; i < embeds.length; i++) {
-    const embed = embeds[i];
-    if (embed.type === "image" && embed.url.match(emojiRegex))
-      embeds.splice(i--, 1);
-  }
+    const embeds = data.message.embeds as Embed[];
+    for (let i = 0; i < embeds.length; i++) {
+      const embed = embeds[i];
+      if (embed.type === "image" && embed.url.match(emojiRegex))
+        embeds.splice(i--, 1);
+    }
 
-  data.message.content = content;
-  data.__realmoji = true;
-}));
+    data.message.content = content;
+    data.__realmoji = true;
+  }),
+);
 
-patches.push(after("generate", RowManager.prototype, ([data], row) => {
-  if (data.rowType !== 1 || data.__realmoji !== true) return;
-  const { content } = row.message as Message;
-  if (!Array.isArray(content)) return;
+patches.push(
+  after("generate", RowManager.prototype, ([data], row) => {
+    if (data.rowType !== 1 || data.__realmoji !== true) return;
+    const { content } = row.message as Message;
+    if (!Array.isArray(content)) return;
 
-  const jumbo = content.every((c) => (c.type === "link" && c.target.match(emojiRegex)) || (c.type === "text" && c.content === " "));
+    const jumbo = content.every(
+      (c) =>
+        (c.type === "link" && c.target.match(emojiRegex)) ||
+        (c.type === "text" && c.content === " "),
+    );
 
-  for (let i = 0; i < content.length; i++) {
-    const el = content[i];
-    if (el.type !== "link") continue;
+    for (let i = 0; i < content.length; i++) {
+      const el = content[i];
+      if (el.type !== "link") continue;
 
-    const match = el.target.match(emojiRegex);
-    if (!match) continue;
-    const id = match[1];
+      const match = el.target.match(emojiRegex);
+      if (!match) continue;
+      const id = match[1];
 
-    let params: URLSearchParams | undefined;
-    try {
-      params = new URL(el.target).searchParams;
-    } catch {}
+      let params: URLSearchParams | undefined;
+      try {
+        params = new URL(el.target).searchParams;
+      } catch {}
 
-    const animated = match[2] === "gif" || params?.get("animated") === "true";
-    const name = getCustomEmojiById(id)?.name ?? params?.get("name") ?? "realmoji";
-    const base = `https://cdn.discordapp.com/emojis/${id}`;
+      const animated = match[2] === "gif" || params?.get("animated") === "true";
+      const name =
+        getCustomEmojiById(id)?.name ?? params?.get("name") ?? "realmoji";
+      const base = `https://cdn.discordapp.com/emojis/${id}`;
 
-    content[i] = {
-      type: "customEmoji",
-      id,
-      alt: `:${name}:`,
-      src: `${base}.${animated ? "gif" : "webp"}?size=128`,
-      frozenSrc: `${base}.webp?size=128`,
-      jumboable: jumbo ? true : undefined,
-    };
-  }
-}));
+      content[i] = {
+        type: "customEmoji",
+        id,
+        alt: `:${name}:`,
+        src: `${base}.${animated ? "gif" : "webp"}?size=128`,
+        frozenSrc: `${base}.webp?size=128`,
+        jumboable: jumbo ? true : undefined,
+      };
+    }
+  }),
+);
 
 export const onUnload = () => patches.forEach((unpatch) => unpatch());
