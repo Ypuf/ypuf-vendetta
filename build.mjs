@@ -21,6 +21,7 @@ for (const entry of entries) {
   }
 
   const manifest = JSON.parse(await readFile(`./${plug}/manifest.json`));
+  const outPath = `./dist/${plug}/index.js`;
   try {
     const bundle = await rollup({
       input: `./${plug}/${manifest.main}`,
