@@ -8,10 +8,21 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import * as esbuild from "esbuild";
 
-for (let plug of await readdir("./")) {
-  const manifest = JSON.parse(await readFile(`./${plug}/manifest.json`));
-  const outPath = `./dist/${plug}/index.js`;
+import { readFile, writeFile, readdir, access } from "fs/promises";
 
+const entries = await readdir("./", { withFileTypes: true });
+for (const entry of entries) {
+  if (!entry.isDirectory()) continue;
+  const plug = entry.name;
+  if (plug.startsWith(".") || plug === "node_modules" || plug === "dist")
+    continue;
+  try {
+    await access(`./${plug}/manifest.json`);
+  } catch {
+    continue;
+  }
+
+  const manifest = JSON.parse(await readFile(`./${plug}/manifest.json`));
   try {
     const bundle = await rollup({
       input: `./${plug}/${manifest.main}`,
