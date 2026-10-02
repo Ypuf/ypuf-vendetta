@@ -9,8 +9,9 @@ const emojiRegex = /https:\/\/cdn.discordapp.com\/emojis\/(\d+)\.(\w+)/;
 const emojiToken =
   /\[[^\]\n]*\]\(https:\/\/cdn\.discordapp\.com\/emojis\/\d+\.\w+[^)\s]*\)|https:\/\/cdn\.discordapp\.com\/emojis\/\d+\.\w+\S*/;
 const emojiLine = new RegExp(
-  `^(?:${emojiToken.source})(?:[ \\t]+(?:${emojiToken.source}))*$`,
+  `^(?:${emojiToken.source})(?:[ \\t]*(?:${emojiToken.source}))*$`,
 );
+const emojiUrlGlobal = new RegExp(emojiRegex.source, "g");
 
 patches.push(
   before("generate", RowManager.prototype, ([data]) => {
@@ -28,7 +29,7 @@ patches.push(
     if (!lines.every((l) => emojiLine.test(l))) return;
     content = content.slice(0, matchIndex);
 
-    if (lines.some((l) => /\s/.test(l))) {
+    if (lines.some((l) => (l.match(emojiUrlGlobal)?.length ?? 0) > 1)) {
       content = (content + lines.join("\n")).trim();
     } else {
       const emojis = lines;
